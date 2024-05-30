@@ -25,7 +25,7 @@ MODULE Yumi_Projet2
   ! Donnees de type constante
   CONST num Epaisseur:=1; ! Épaisseur d'un bloc (en pouces)
   CONST num PouceToMM:=25.4; ! Facteur de conversion
-  CONST num Decalage:=100; ! Distance d'approche ou de retrait (mm)
+  CONST num Decalage:=200; ! Distance d'approche ou de retrait (mm)
 
   ! Données de type Variable
   VAR num EpaisMM:=0;
@@ -85,7 +85,8 @@ PROC main()
 	MoveJ rRetrait,HighSpeed, fine, tPince\wobj:=wobj0;
 	
 	
-    g_GripOut;! Ouvrir la pince
+    !g_GripOut;! Ouvrir la pince
+    Pince_ouverture;
     WaitTime 2;
     
     !Pince\Ouvert; 
@@ -118,7 +119,8 @@ PROC init()
 	SetDO CabinetIO_0_DO9_FV0101, Retracte; ! Rentrer le vérin         %% IRB1600: CabinetIO_0_DO9_FV0101, Retracte
 	 
 
-    g_GripOut; ! Ouvrir la pince
+    !g_GripOut; ! Ouvrir la pince
+    Pince_ouverture;
     WaitTime 2;
     
 ENDPROC
@@ -153,12 +155,11 @@ PROC Prise()
 	WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
 	MoveL rGlissoire, LowSpeed, fine, tPince\wobj:=wobj0;
 	
-    
-   
 	SetDO CabinetIO_0_DO9_FV0101, Retracte;
     !WAITDI CabinetIO_0_DI14_ZS0104,0;
 	 WAITDI CabinetIO_0_DI13_ZS0103,1;
-     g_GripIn; ! Fermer la pince
+     !g_GripIn; ! Fermer la pince
+     Pince_fermeture;
     
 	MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,tPince\wobj:=wobj0;
 	
@@ -183,14 +184,25 @@ PROC Depot(robtarget rPosDepot)
 	MoveJ RelTool(rPosDepot,0,0,-Decalage),HighSpeed, z50, tPince\wobj:=wobj0;
 	MoveL rPosDepot,LowSpeed, fine, tPince\wobj:=wobj0;
 	
-    g_GripOut;! Ouvrir la pince
+    !g_GripOut;! Ouvrir la pince
+    Pince_ouverture;
     g_stop;
 	MoveL RelTool(rPosDepot,0,0,-Decalage),LowSpeed, z50, tPince\wobj:=wobj0;
 
 ENDPROC
 !**************************************************************************************
 
-!test de commit
+PROC Pince_ouverture()
+    SetDO custom_DO_0_gClose,0;
+    SetDO custom_DO_1_gOpen,1;
+    WaitTime 2.0;
+ENDPROC
+PROC Pince_fermeture()
+    SetDO custom_DO_0_gClose,1;
+    SetDO custom_DO_1_gOpen,0;
+    WaitTime 2.0;
+ENDPROC
+    
 
 !**************************************************************************************
 ENDMODULE
