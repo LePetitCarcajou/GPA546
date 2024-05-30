@@ -63,7 +63,7 @@ PROC main()
 	init;
      
 	! Deplacement a la position de repos
-	MoveJ rRetrait, HighSpeed, fine, wi_tGripper\wobj:=wobj0;
+	MoveJ rRetrait, HighSpeed, fine, tPince\wobj:=wobj0;
 
 	! 2) Calculs :
 	EpaisMM := Epaisseur * PouceToMM; ! Conversion en mm
@@ -82,7 +82,7 @@ PROC main()
 	Depot(rDepot2);
 
 	! 5) Retourner le robot a la position de repos
-	MoveJ rRetrait,HighSpeed, fine, wi_tGripper\wobj:=wobj0;
+	MoveJ rRetrait,HighSpeed, fine, tPince\wobj:=wobj0;
 	
 	
     g_GripOut;! Ouvrir la pince
@@ -148,10 +148,10 @@ PROC Prise()
 	ENDIF
 
 	! Prehension du bloc
-	MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,wi_tGripper\wobj:=wobj0;
+	MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,tPince\wobj:=wobj0;
 	SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
 	WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
-	MoveL rGlissoire, LowSpeed, fine, wi_tGripper\wobj:=wobj0;
+	MoveL rGlissoire, LowSpeed, fine, tPince\wobj:=wobj0;
 	
     
    
@@ -160,7 +160,7 @@ PROC Prise()
 	 WAITDI CabinetIO_0_DI13_ZS0103,1;
      g_GripIn; ! Fermer la pince
     
-	MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,wi_tGripper\wobj:=wobj0;
+	MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,tPince\wobj:=wobj0;
 	
 ENDPROC
 !**************************************************************************************
@@ -180,12 +180,12 @@ ENDPROC
 !**************************************************************************************
 PROC Depot(robtarget rPosDepot)
 
-	MoveJ RelTool(rPosDepot,0,0,-Decalage),HighSpeed, z50, wi_tGripper\wobj:=wobj0;
-	MoveL rPosDepot,LowSpeed, fine, wi_tGripper\wobj:=wobj0;
+	MoveJ RelTool(rPosDepot,0,0,-Decalage),HighSpeed, z50, tPince\wobj:=wobj0;
+	MoveL rPosDepot,LowSpeed, fine, tPince\wobj:=wobj0;
 	
     g_GripOut;! Ouvrir la pince
     g_stop;
-	MoveL RelTool(rPosDepot,0,0,-Decalage),LowSpeed, z50, wi_tGripper\wobj:=wobj0;
+	MoveL RelTool(rPosDepot,0,0,-Decalage),LowSpeed, z50, tPince\wobj:=wobj0;
 
 ENDPROC
 !**************************************************************************************
