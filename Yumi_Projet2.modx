@@ -22,6 +22,7 @@ MODULE Yumi_Projet2
   
   PERS robtarget rDepot:=[[-350.65,-89.54,24.38],[0.0307318,0.699666,-0.713584,0.0179325],[0,1,1,4],[-12.3598,9E+09,9E+09,9E+09,9E+09,9E+09]];
 
+  PERS num NbBranches := 0; ! Valeur qui changera grace à la procédure de demande de config
   ! Donnees de type position calculees
   VAR robtarget rDepot2;
 
@@ -74,7 +75,7 @@ PROC main()
 	! Deplacement a la position de repos
 	MoveJ rRetrait, HighSpeed, fine, tPince\wobj:=wobj0;
     
-
+    !demande_configuration;
 	! 2) Calculs :
 	EpaisMM := Epaisseur * PouceToMM; ! Conversion en mm
 	rDepot2 := Offs(rDepot,0,0,EpaisMM);
@@ -231,7 +232,17 @@ PROC Pince_fermeture()
     WaitTime 2.0;
 ENDPROC
 
-
+!**************************************************************************************
+! ----------------------------------------------------------------------------
+! Procedure : securtie
+! Auteurs : MArtin EUZENAT
+! Date : 01/06/2024
+! Révision : 1.1
+! Révision par:
+! Description :
+! Routine permet d'effectuer la routine de sécurité afin de débuter le fonctionnement
+! du robot 
+!
 PROC securite()
     !positionActuelle:=CPos
     positionRetrait := rRetrait.trans;
@@ -249,6 +260,25 @@ PROC securite()
     
 ENDPROC
 
+!**************************************************************************************
+! ----------------------------------------------------------------------------
+! Procedure : demande_configuration
+! Auteurs : Martin EUZENAT
+! Date : 30/05/2024
+! Révision : 1.1
+! Révision par:
+! Description :
+! Cette procédure permet de demander la configuration souhaiter par l'utilisateur 
+!et de stocker ce choix dans le but de l'exploiter
+!
+!PROC demande_configuration()
+!    TPReadFK "Quelle configuration souhaitee vous? (3 a 7):","Nombre de branches",NbBranches;
+!    WHILE 3< NbBranches OR NbBranches <7 DO
+!        TPWrite "nombre de branches non valide veuillez reessayer
+!        TPReadFK "Quelle configuration souhaitee vous? (3 a 7):", "Nombre de branches",NbBranches;
+!    ENDWHILE
+    
+!ENDPROC
 !**************************************************************************************
 ENDMODULE
 
