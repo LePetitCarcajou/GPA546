@@ -4,7 +4,7 @@ MODULE Yumi_Projet2
 !=========================================== 
 ! ----------------------------------------------------------------------------
 ! Programme : GPA546Lab1
-! Auteurs : Martin  ET Roberto
+! Auteurs : Martin ET Roberto
 ! Date : 22/05/2024
 ! Révision : 1.0
 !
@@ -204,7 +204,7 @@ ENDPROC
 !**************************************************************************************
 ! ----------------------------------------------------------------------------
 ! Procedure : Pince_ouverture
-! Auteurs : MArtin EUZENAT
+! Auteurs : Martin EUZENAT
 ! Date : 30/05/2024
 ! Révision : 1.1
 ! Révision par:
@@ -219,10 +219,10 @@ ENDPROC
 !**************************************************************************************
 ! ----------------------------------------------------------------------------
 ! Procedure : Pince_fermeture 
-! Auteurs : MArtin EUZENAT
+! Auteurs : Martin EUZENAT
 ! Date : 30/05/2024
 ! Révision : 1.1
-! Révision par:
+! Révision par :
 ! Description :
 ! Routine permet l'ouverture de la pince dans la simulation
 !
@@ -234,27 +234,29 @@ ENDPROC
 
 !**************************************************************************************
 ! ----------------------------------------------------------------------------
-! Procedure : securtie
-! Auteurs : MArtin EUZENAT
-! Date : 01/06/2024
-! Révision : 1.1
-! Révision par:
+! Procedure : Securite
+! Auteurs : Martin EUZENAT
+! Date : 03/06/2024
+! Révision : 1.2
+! Révision par : Roberto Laframboise
 ! Description :
 ! Routine permet d'effectuer la routine de sécurité afin de débuter le fonctionnement
 ! du robot 
 !
-PROC securite()
-    !positionActuelle:=CPos
-    positionRetrait := rRetrait.trans;
-    distanceSecurite := Distance(positionActuelle,positionRetrait);
+PROC Securite()
+    positionActuelle:= CPos();
+    positionRetrait:= rRetrait.trans;
+    distanceSecurite:= Distance(positionActuelle,positionRetrait);
     
-    IF distanceSecurite<=50 THEN !Validation réussie allume led bleue 2secondes et on bouge 
+    IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes
+        SetDO DO04_EE_LampBlu, 1;
+        SetDO \SDelay:=2, DO04_EE_LampBlu, 0;
         
-    ELSE !Validation pas réussie affiche le détail de l'erreur et affiche la distance lampe orange allumée 5secondes
+    ELSE ! Validation pas réussie, affiche le détail de l'erreur et la distance, allume lampe orange 5 secondes
         TPWrite "Distance non conforme, robot trop éloigné";
-        TPWrite "Rapprochez le robot de"+differenceSecurite+"mm";
+        TPWrite "Rapprochez le robot de "+differenceSecurite+" mm";
         
-        WaitTime 5.0; !temporisatino de 5s
+        WaitTime 5.0; ! temporisation de 5s
         EXIT; ! fin de programme
     ENDIF
     
