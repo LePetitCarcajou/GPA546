@@ -70,8 +70,8 @@ PROC main()
 	! 1) Initialisation :
 	init;
     
-    !securite;
-     
+    Securite;
+
 	! Deplacement a la position de repos
 	MoveJ rRetrait, HighSpeed, fine, tPince\wobj:=wobj0;
     
@@ -249,14 +249,16 @@ PROC Securite()
     distanceSecurite:= Distance(positionActuelle,positionRetrait);
     
     IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes
-        SetDO DO04_EE_LampBlu, 1;
-        SetDO \SDelay:=2, DO04_EE_LampBlu, 0;
+        SetDO CabinetIO_0_DO4_JB01_LampBlu, 1;
+        SetDO \SDelay:=2, CabinetIO_0_DO4_JB01_LampBlu, 0;
         
     ELSE ! Validation pas réussie, affiche le détail de l'erreur et la distance, allume lampe orange 5 secondes
         TPWrite "Distance non conforme, robot trop éloigné";
         TPWrite "Rapprochez le robot de "+differenceSecurite+" mm";
+        SetDO CabinetIO_0_DO5_JB01_LampOr, 1;
         
         WaitTime 5.0; ! temporisation de 5s
+        SetDO CabinetIO_0_DO5_JB01_LampOr, 0;
         EXIT; ! fin de programme
     ENDIF
     
