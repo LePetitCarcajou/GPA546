@@ -4,7 +4,7 @@ MODULE Yumi_Projet2
 !=========================================== 
 ! ----------------------------------------------------------------------------
 ! Programme : GPA546Lab1
-! Auteurs : Martin ET Roberto 
+! Auteurs : Martin ET Roberto
 ! Date : 22/05/2024
 ! Révision : 1.0
 !
@@ -81,8 +81,7 @@ PROC main()
 	! 1) Initialisation :
 	init;
     
-              
-     
+    
     ! Deplacement a la position de repos
 	MoveJ rRetrait, HighSpeed, fine, tPince\wobj:=wobj0;
     
@@ -173,22 +172,21 @@ PROC Prise()
     AliasIO CabinetIO_0_DI10_ZS0102, pieceOrientation;
     rGlissoire_180:=RelTool(rGlissoire,0,0,0,\Rz:=180);
     ! Vérification de présence de bloc dans la glissoire
-                                   
 	IF piecePresente = 0 THEN
 		TPErase;
 		TPWrite "Aucun bloc dans la glissoire";
 		TPWrite "Placer deux bloc et remettre en mode AUTO";
-		WaitDI piecePresente, 1; ! Attente d'un bloc         
+		WaitDI piecePresente, 1; ! Attente d'un bloc
 		Waittime 1; ! attente que le bloc se stabilise
 	ENDIF
     !Test orientation piece 
     IF pieceOrientation=0 THEN
 !        ! Prehension du bloc
-        
+        MoveL  rGlissoire_180,HighSpeed,fine,tPince\wobj:=wobj0;
+
         MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,tPince\wobj:=wobj0;
-        MoveL rGlissoire_180,HighSpeed,fine,tPince\wobj:=wobj0;
-        SetDO extensionVerin, Extension; ! Indexer le bloc durant le mouvement 
-        WAITDI verinOut,1; ! Attendre pour le vérin sortie        
+        SetDO extensionVerin, Extension; ! Indexer le bloc durant le mouvement
+        WAITDI verinOut,1; ! Attendre pour le vérin sortie
         SetDO extensionVerin, Retracte;
         !WAITDI CabinetIO_0_DI14_ZS0104,0;
         WAITDI verinIn,1;
@@ -214,13 +212,6 @@ PROC Prise()
         
     ENDIF
 	
-                                        
-                                      
-                                   
-                                 
-                     
-    
-                                                                         
 	
 ENDPROC
 !**************************************************************************************
@@ -292,9 +283,6 @@ ENDPROC
 ! du robot 
 !
 PROC Securite()
-                           
-                                      
-                                                                   
     AliasIO CabinetIO_0_DO4_JB01_LampBlu,LampeBleue;
     AliasIO CabinetIO_0_DO5_JB01_LampOr,LampeOrange;
     
@@ -302,11 +290,11 @@ PROC Securite()
     positionRetrait:= rRetrait.trans;
     distanceSecurite:= Distance(positionActuelle,positionRetrait);
     
-    IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes        
+    IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes
         SetDO LampeBleue, 1;
         SetDO \SDelay:=2, LampeBleue, 0;
         
-    ELSE ! Validation pas réussie, affiche le détail de l'erreur et la distance, allume lampe orange 5 secondes     
+    ELSE ! Validation pas réussie, affiche le détail de l'erreur et la distance, allume lampe orange 5 secondes
         TPWrite "Distance non conforme, robot trop éloigné";
         TPWrite "Rapprochez le robot de "+differenceSecurite+" mm";
         SetDO LampeOrange, 1;
@@ -330,10 +318,10 @@ ENDPROC
 !et de stocker ce choix dans le but de l'exploiter
 !
 !PROC demande_configuration()
-!    TPReadFK "Quelle configuration souhaitee vous? (3 a 7):","Nombre de branches",NbBranches;
+!    TPReadNum NbBranches, "Quelle configuration souhaitee vous? (3 a 7):";
 !    WHILE 3< NbBranches OR NbBranches <7 DO
-!        TPWrite "nombre de branches non valide veuillez reessayer
-!        TPReadFK "Quelle configuration souhaitee vous? (3 a 7):", "Nombre de branches",NbBranches;
+!        TPWrite "Nombre de branches non valide, veuillez reessayer";
+!        TPReadNum NbBranches, "Quelle configuration souhaitee vous? (3 a 7):";
 !    ENDWHILE
     
 !ENDPROC
