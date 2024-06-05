@@ -4,7 +4,7 @@ MODULE Yumi_Projet2
 !=========================================== 
 ! ----------------------------------------------------------------------------
 ! Programme : GPA546Lab1
-! Auteurs : Martin ET Roberto
+! Auteurs : Martin ET Roberto 
 ! Date : 22/05/2024
 ! Révision : 1.0
 !
@@ -21,6 +21,7 @@ MODULE Yumi_Projet2
   PERS robtarget rRetrait:=[[-266.00,14.12,221.80],[0.000550089,-0.980448,0.184406,0.0686662],[0,2,-2,5],[-1.30968,9E+09,9E+09,9E+09,9E+09,9E+09]];
   
   PERS robtarget rDepot:=[[-350.65,-89.54,24.38],[0.0307318,0.699666,-0.713584,0.0179325],[0,1,1,4],[-12.3598,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  
 
   PERS num NbBranches := 0; ! Valeur qui changera grace à la procédure de demande de config
   ! Donnees de type position calculees
@@ -37,7 +38,8 @@ MODULE Yumi_Projet2
   VAR pos positionRetrait;
   VAR pos positionActuelle;
   VAR string differenceSecurite;
-
+  VAR bool orientation;
+  VAR robtarget rGlissoire_180;
   ! Vitesse d'approche et de retrait (mm/sec)
   CONST speeddata LowSpeed:=[250,500,5000,1000];
   
@@ -52,6 +54,15 @@ MODULE Yumi_Projet2
 
   ! Variable pour limiter la zone de travail du robot
   VAR wztemporary EspaceRestreint;
+  
+  !Alias
+  VAR signaldo LampeBleue;
+  VAR signaldo LampeOrange;
+  VAR signaldi pieceOrientation;
+  VAR signaldi piecePresente;
+  VAR signaldi verinOut;
+  VAR signaldi verinIn;
+  VAR signaldo extensionVerin;
 
 ! ----------------------------------------------------------------------------
 ! Procedure : main
@@ -70,10 +81,15 @@ PROC main()
 	! 1) Initialisation :
 	init;
     
+              
+     
+    ! Deplacement a la position de repos
+	MoveJ rRetrait, HighSpeed, fine, tPince\wobj:=wobj0;
+    
+    
+    !Verification de la securité
     Securite;
 
-	! Deplacement a la position de repos
-	MoveJ rRetrait, HighSpeed, fine, tPince\wobj:=wobj0;
     
     !demande_configuration;
 	! 2) Calculs :
@@ -150,29 +166,61 @@ ENDPROC
 ! ----------------------------------------------------------------------------
 !**************************************************************************************
 PROC Prise()
-
-! Vérification de présence de bloc dans la glissoire
-	IF CabinetIO_0_DI9_ZS0101 = 0 THEN
+    AliasIO CabinetIO_0_DI9_ZS0101, piecePresente;
+    AliasIO CabinetIO_0_DO9_FV0101,extensionVerin;
+    AliasIO CabinetIO_0_DI14_ZS0104, verinOut;
+    AliasIO CabinetIO_0_DI13_ZS0103,verinIn;
+    AliasIO CabinetIO_0_DI10_ZS0102, pieceOrientation;
+    rGlissoire_180:=RelTool(rGlissoire,0,0,0,\Rz:=180);
+    ! Vérification de présence de bloc dans la glissoire
+                                   
+	IF piecePresente = 0 THEN
 		TPErase;
 		TPWrite "Aucun bloc dans la glissoire";
 		TPWrite "Placer deux bloc et remettre en mode AUTO";
-		WaitDI CabinetIO_0_DI9_ZS0101, 1; ! Attente d'un bloc
+		WaitDI piecePresente, 1; ! Attente d'un bloc         
 		Waittime 1; ! attente que le bloc se stabilise
 	ENDIF
-
-	! Prehension du bloc
-	MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,tPince\wobj:=wobj0;
-	SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
-	WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
-	MoveL rGlissoire, LowSpeed, fine, tPince\wobj:=wobj0;
+    !Test orientation piece 
+    IF pieceOrientation=0 THEN
+!        ! Prehension du bloc
+        
+        MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,tPince\wobj:=wobj0;
+        MoveL rGlissoire_180,HighSpeed,fine,tPince\wobj:=wobj0;
+        SetDO extensionVerin, Extension; ! Indexer le bloc durant le mouvement 
+        WAITDI verinOut,1; ! Attendre pour le vérin sortie        
+        SetDO extensionVerin, Retracte;
+        !WAITDI CabinetIO_0_DI14_ZS0104,0;
+        WAITDI verinIn,1;
+        !g_GripIn; ! Fermer la pince
+        Pince_fermeture;
+        MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,tPince\wobj:=wobj0;
+       
+    ELSEIF pieceOrientation=1 THEN
+        ! Prehension du bloc
+        
+        MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,tPince\wobj:=wobj0;
+        SetDO extensionVerin, Extension; ! Indexer le bloc durant le mouvement
+        WAITDI verinOut,1; ! Attendre pour le vérin sortie
+        MoveL rGlissoire, LowSpeed, fine, tPince\wobj:=wobj0;
+        
+        SetDO extensionVerin, Retracte;
+        !WAITDI CabinetIO_0_DI14_ZS0104,0;
+        WAITDI verinIn,1;
+        !g_GripIn; ! Fermer la pince
+        Pince_fermeture;
+        MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,tPince\wobj:=wobj0;
+    ELSE
+        
+    ENDIF
 	
-	SetDO CabinetIO_0_DO9_FV0101, Retracte;
-    !WAITDI CabinetIO_0_DI14_ZS0104,0;
-	 WAITDI CabinetIO_0_DI13_ZS0103,1;
-     !g_GripIn; ! Fermer la pince
-     Pince_fermeture;
+                                        
+                                      
+                                   
+                                 
+                     
     
-	MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,tPince\wobj:=wobj0;
+                                                                         
 	
 ENDPROC
 !**************************************************************************************
@@ -244,21 +292,27 @@ ENDPROC
 ! du robot 
 !
 PROC Securite()
+                           
+                                      
+                                                                   
+    AliasIO CabinetIO_0_DO4_JB01_LampBlu,LampeBleue;
+    AliasIO CabinetIO_0_DO5_JB01_LampOr,LampeOrange;
+    
     positionActuelle:= CPos();
     positionRetrait:= rRetrait.trans;
     distanceSecurite:= Distance(positionActuelle,positionRetrait);
     
-    IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes
-        SetDO CabinetIO_0_DO4_JB01_LampBlu, 1;
-        SetDO \SDelay:=2, CabinetIO_0_DO4_JB01_LampBlu, 0;
+    IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes        
+        SetDO LampeBleue, 1;
+        SetDO \SDelay:=2, LampeBleue, 0;
         
-    ELSE ! Validation pas réussie, affiche le détail de l'erreur et la distance, allume lampe orange 5 secondes
+    ELSE ! Validation pas réussie, affiche le détail de l'erreur et la distance, allume lampe orange 5 secondes     
         TPWrite "Distance non conforme, robot trop éloigné";
         TPWrite "Rapprochez le robot de "+differenceSecurite+" mm";
-        SetDO CabinetIO_0_DO5_JB01_LampOr, 1;
+        SetDO LampeOrange, 1;
         
         WaitTime 5.0; ! temporisation de 5s
-        SetDO CabinetIO_0_DO5_JB01_LampOr, 0;
+        SetDO LampeOrange, 0;
         EXIT; ! fin de programme
     ENDIF
     
@@ -284,5 +338,7 @@ ENDPROC
     
 !ENDPROC
 !**************************************************************************************
+
+
 ENDMODULE
 
