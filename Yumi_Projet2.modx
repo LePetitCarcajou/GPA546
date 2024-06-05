@@ -304,15 +304,15 @@ ENDPROC
 ! Révision : 1.1
 ! Révision par:
 ! Description :
-! Routine permet al fermeture de la pince dans la simulation
+! Routine permet la fermeture de la pince simulation/experimentation
 !
 PROC Pince_ouverture()
-    IF IS_SIMULATED THEN
+    IF IS_SIMULATED THEN 
     SetDO custom_DO_0_gClose,0;
     SetDO custom_DO_1_gOpen,1;
     WaitTime 2.0;
     ELSE
-        g_GripOut;
+        g_GripOut; !experimentation
     ENDIF
 ENDPROC
 !**************************************************************************************
@@ -323,7 +323,7 @@ ENDPROC
 ! Révision : 1.1
 ! Révision par :
 ! Description :
-! Routine permet l'ouverture de la pince dans la simulation
+! Routine permet la fermeture de la pince simulation/experimentation
 !
 PROC Pince_fermeture()
     
@@ -332,7 +332,7 @@ PROC Pince_fermeture()
     SetDO custom_DO_1_gOpen,0;
     WaitTime 2.0;
     ELSE
-        g_GripIn;
+        g_GripIn; !experimentation
     ENDIF
 ENDPROC
 
@@ -357,7 +357,9 @@ PROC Securite()
     
     IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes
         SetDO LampeBleue, 1;
-        SetDO \SDelay:=2, LampeBleue, 0;
+        SetDO \SDelay:=2, LampeBleue, 0; !eteindre la lampe après 2s
+        
+        TPWrite "Validation de la position, Lancement programme!";
         
     ELSE ! Validation pas réussie, affiche le détail de l'erreur et la distance, allume lampe orange 5 secondes
         TPWrite "Distance non conforme, robot trop éloigné";
