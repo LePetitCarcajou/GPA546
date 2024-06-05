@@ -1,0 +1,15 @@
+﻿################################################################################
+# Ce fichier .gitignore a été automatiquement créé par Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
+/.vs/GPA546/FileContentIndex/73e45df9-3636-40c1-8faf-051dbd0932e4.vsidx
+/.vs/GPA546/FileContentIndex/5a362408-69c6-40dd-9489-171dd6ce143a.vsidx
+/.vs/GPA546/FileContentIndex/800368f8-7840-4be9-884a-e3ca3a6fdd7a.vsidx
+/.vs/GPA546/v17/DocumentLayout.json
+/.vs/GPA546/v17/.wsuo
+/.vs/GPA546/FileContentIndex/99cd2f89-93f6-4adf-8679-08ff12cbb06c.vsidx
+/.vs/GPA546/FileContentIndex/fc6a58f3-9a6c-47a4-b94e-12cabfde1450.vsidx
+/.vs/GPA546/FileContentIndex/bff53eeb-331c-4617-b18e-cc711cd1ac73.vsidx
