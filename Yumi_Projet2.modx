@@ -40,10 +40,11 @@ PERS num NbBranches; ! Valeur qui changera grace à la procédure de demande de 
 ! Donnees de type position calculees
 VAR robtarget rDepot2;
 VAR robtarget rFigure;
+
 ! Donnees de type constante
 CONST num Epaisseur:=1; ! Épaisseur d'un bloc (en pouces)
 CONST num PouceToMM:=25.4; ! Facteur de conversion
-CONST num Decalage:=200; ! Distance d'approche ou de retrait (mm)
+CONST num Decalage:=-200; ! Distance d'approche ou de retrait (mm)
 
 ! Données de type Variable
 VAR num EpaisMM:=0;
@@ -120,13 +121,8 @@ PROC main()
     wobjTable.uframe:=wobjFeuille.uframe;
     configuration;
 	! 1) Initialisation :
-	!init;
+	init;
     
-    ! Deplacement a la position de repos
-	!MoveJ rRetrait, HighSpeed, fine, tPince\wobj:=wobj0;
-	!MoveJ coin_feuille, HighSpeed, fine, tPince\wobj:=wobjFeuille;
-    
-    !Prise;
     !Verification de la securité
     !Securite;
 
@@ -185,7 +181,7 @@ PROC Prise()
     AliasIO CabinetIO_0_DI14_ZS0104, verinOut;
     AliasIO CabinetIO_0_DI13_ZS0103,verinIn;
     AliasIO CabinetIO_0_DI10_ZS0102, pieceOrientation;
-    rGlissoire_180:=RelTool(rGlissoire,0,0,0,\Rz:=180);
+    !rGlissoire_180:=RelTool(rGlissoire,0,0,0,\Rz:=180);
     
     ! Vérification de présence de bloc dans la glissoire
 	IF piecePresente = 0 THEN
@@ -196,54 +192,20 @@ PROC Prise()
 		Waittime 1; ! attente que le bloc se stabilise
 	ENDIF
     !Test orientation piece 
-    IF pieceOrientation=0 THEN
-!        ! Prehension du bloc
-        !§§§§§§§§§§  SIMULATION §§§§§§§§!
-        MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,pince\wobj:=wobj0;
-        MoveL  rGlissoire_180,HighSpeed,fine,pince\wobj:=wobj0;
-        
-        !§§§§§§§§§§  EXPERIMENTATION §§§§§§§§!
-        !MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,wi_tGripper\wobj:=wobjTable;
-        !MoveL  rGlissoire_180,HighSpeed,fine,wi_tGripper\wobj:=wobjTable;
-        
-        SetDO extensionVerin, Extension; ! Indexer le bloc durant le mouvement
-        WAITDI verinOut,1; ! Attendre pour le vérin sortie
-        SetDO extensionVerin, Retracte;
-        !WAITDI CabinetIO_0_DI14_ZS0104,0;
-        WAITDI verinIn,1;
-        !g_GripIn; ! Fermer la pince experimentation
-        Pince_fermeture; ! Fermer la pince simulation
-        
-        MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,tPince\wobj:=wobj0;
-        !MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,wi_tGripper\wobj:=wobjTable;
-       
-    ELSEIF pieceOrientation=1 THEN
-        ! Prehension du bloc
-        
-        MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,tPince\wobj:=wobj0;
-        !MoveJ RelTool(rGlissoire,0,0,-Decalage),HighSpeed,z50,wi_tGripper\wobj:=wobjTable;
-        
-        SetDO extensionVerin, Extension; ! Indexer le bloc durant le mouvement
-        WAITDI verinOut,1; ! Attendre pour le vérin sortie
-        
-        MoveL rGlissoire, LowSpeed, fine,tPince\wobj:=wobj0;
-        !MoveL rGlissoire, LowSpeed, fine, wi_tGripper\wobj:=wobjTable;
-        
-        SetDO extensionVerin, Retracte;
-        !WAITDI CabinetIO_0_DI14_ZS0104,0;
-        WAITDI verinIn,1;
-        !g_GripIn; ! Fermer la pince
-        Pince_fermeture;
-        
-        MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,tPince\wobj:=wobj0;
-        !MoveL RelTool(rGlissoire,0,0,-Decalage),LowSpeed,z50,wi_tGripper\wobj:=wobjTable;
-    ELSE
-        TPErase;
-		TPWrite "Erreur dans la détectino d'orientation";
-        
-    ENDIF
-	
-	
+    orientation:=TestDi(pieceOrientation);
+    
+    !!!!!On s'approche de la position!!!!!
+	MoveJ RelTool(rGlissoire,0,0,Decalage),HighSpeed,z50,pince\WObj:=wobj0;
+    SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
+    WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
+    
+    !!!!!!On se met en position
+    MoveL rGlissoire, LowSpeed, fine, pince\WObj:=wobj0;
+    SetDO CabinetIO_0_DO9_FV0101, Retracte;
+    WAITDI CabinetIO_0_DI13_ZS0103,1;
+    Pince_fermeture;! Fermer la pince
+    MoveL RelTool(rGlissoire,0,0,Decalage),LowSpeed,z50,pince\WObj:=wobj0;
+
 ENDPROC
 !**************************************************************************************
 ! ----------------------------------------------------------------------------
@@ -265,9 +227,20 @@ PROC ProcedureEtoile()
     !On cherche la piece dans la glissière avec prise.
     !On deplace la piece au centre de depot
     Prise;
-    Depot(rDepot);
+    ConfL\On;
+    ConfJ\On;
+    MoveJ coin_feuille,HighSpeed,z50,tPince\WObj:=wobjFeuille;
+    ConfL\Off;
+    ConfJ\Off;
+    
+    rDepot2:=RelTool(coin_feuille, 0,0,0 \Rz:= (i * (360/(NbBranches+2))));
+    WaitTime 1.5;
+    
+    Depot(rDepot2);
+    
     ENDFOR
-
+    
+    MoveJ rRetrait,HighSpeed,z50,pince\WObj:=wobj0;
 
 ENDPROC
 ! ----------------------------------------------------------------------------
@@ -284,19 +257,21 @@ ENDPROC
 ! ----------------------------------------------------------------------------
 !**************************************************************************************
 PROC Depot(robtarget rPosDepot)
-
-	MoveJ RelTool(rPosDepot,0,0,-Decalage),HighSpeed, z50,tPince\wobj:=wobj0;
-	MoveL rPosDepot,LowSpeed, fine,tPince\wobj:=wobj0;
     
-	!MoveJ RelTool(rPosDepot,0,0,-Decalage),HighSpeed, z50, wi_tGripper\wobj:=wobjFeuille;
-	!MoveL rPosDepot,LowSpeed, fine, wi_tGripper\wobj:=wobjFeuille;
-	
-    !g_GripOut;! Ouvrir la pince
+	MoveJ RelTool(rPosDepot,0,0,0), HighSpeed, z50, pince\wobj:=wobjFeuille;
+	MoveL rPosDepot, LowSpeed, fine,pince\wobj:=wobjFeuille;
+    
     Pince_ouverture;
     g_stop;
+    !Pince_Ouvre;
     
-	MoveL RelTool(rPosDepot,0,0,-Decalage),LowSpeed, z50,tPince\wobj:=wobj0;
-	!MoveL RelTool(rPosDepot,0,0,-Decalage),LowSpeed, z50, wi_tGripper\wobj:=wobjFeuille;
+    ConfL\Off;
+	MoveL RelTool(rPosDepot,0,0,0), LowSpeed, fine,pince\wobj:=wobjFeuille;
+    ConfL\On;
+    
+    Confj\Off;
+    MoveJ RelTool(rPosDepot,0,0,0), HighSpeed, z50,pince\wobj:=wobjFeuille;
+    Confj\On;
 
 ENDPROC
 !**************************************************************************************
@@ -354,6 +329,8 @@ PROC Securite()
     AliasIO CabinetIO_0_DO4_JB01_LampBlu,LampeBleue;
     AliasIO CabinetIO_0_DO5_JB01_LampOr,LampeOrange;
     
+    
+    MoveJ coin_feuille,HighSpeed,z50,pince\WObj:=wobjFeuille;
     positionActuelle:= CPos();!ajouter wobjobejt
     positionRetrait:= coin_feuille.trans;
     distanceSecurite:= Distance(positionActuelle,positionRetrait);
