@@ -47,13 +47,18 @@ CONST num PouceToMM:=25.4; ! Facteur de conversion
 CONST num Decalage:=-200; ! Distance d'approche ou de retrait (mm)
 
 ! Données de type Variable
-VAR num EpaisMM:=0;
+VAR num EpaisMM:=Epaisseur*PouceToMM;
 VAR num distanceSecurite;
 VAR pos positionRetrait;
 VAR pos positionActuelle;
 VAR string differenceSecurite;
 VAR bool orientation;
 VAR robtarget rGlissoire_180;
+VAR num angle_decalage;
+VAR num dist_decalage;
+
+
+
 ! Vitesse d'approche et de retrait (mm/sec)
 CONST speeddata LowSpeed:=[250,500,5000,1000];
 
@@ -194,11 +199,12 @@ PROC Prise()
     !Test orientation piece 
     orientation:=TestDi(pieceOrientation);
     
-    !!!!!On s'approche de la position!!!!!
+    !!!!!On s'approche de la position!!!!
+    ConfJ\On;
 	MoveJ RelTool(rGlissoire,0,0,Decalage),HighSpeed,z50,pince\WObj:=wobj0;
     SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
     WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
-    
+    ConfJ\Off;
     !!!!!!On se met en position
     MoveL rGlissoire, LowSpeed, fine, pince\WObj:=wobj0;
     SetDO CabinetIO_0_DO9_FV0101, Retracte;
@@ -227,16 +233,33 @@ PROC ProcedureEtoile()
     !On cherche la piece dans la glissière avec prise.
     !On deplace la piece au centre de depot
     Prise;
-    ConfL\On;
     ConfJ\On;
     MoveJ coin_feuille,HighSpeed,z50,tPince\WObj:=wobjFeuille;
-    ConfL\Off;
     ConfJ\Off;
     
-    rDepot2:=RelTool(coin_feuille, 0,0,0 \Rz:= (i * (360/(NbBranches+2))));
-    WaitTime 1.5;
+    angle_decalage :=(360/(NbBranches+2));
+    !apothème d'un polygone régulier https://fr.wikipedia.org/wiki/Apoth%C3%A8me
     
-    Depot(rDepot2);
+    dist_decalage:= (Epaisseur/(2*tan(pi/NbBranches)));
+    
+    IF orientation = TRUE THEN
+        rFigure:=RelTool(coin_feuille, 0,0,0 \Rz:= 180+(i * angle_decalage));
+        rFigure:= RelTool(rFigure,0,-dist_decalage,0);
+        WaitTime 1.5;
+        Depot(rFigure);
+    ENDIF
+    IF orientation = FALSE THEN
+        !!On tourne l'outil de l'angle souhaité
+        rFigure:=RelTool(coin_feuille, 0,0,0 \Rz:=(i * angle_decalage));
+        !!On décale l'outil de la distance souhaitée
+        rFigure:= RelTool(rFigure,0,-dist_decalage,0);
+        WaitTime 1.5;
+        Depot(rFigure);
+        
+    ENDIF
+
+    
+    
     
     ENDFOR
     
@@ -257,21 +280,19 @@ ENDPROC
 ! ----------------------------------------------------------------------------
 !**************************************************************************************
 PROC Depot(robtarget rPosDepot)
-    
+
+    ConfJ\On;
+    ConfL\On;
 	MoveJ RelTool(rPosDepot,0,0,0), HighSpeed, z50, pince\wobj:=wobjFeuille;
 	MoveL rPosDepot, LowSpeed, fine,pince\wobj:=wobjFeuille;
-    
     Pince_ouverture;
     g_stop;
     !Pince_Ouvre;
     
-    ConfL\Off;
 	MoveL RelTool(rPosDepot,0,0,0), LowSpeed, fine,pince\wobj:=wobjFeuille;
-    ConfL\On;
-    
-    Confj\Off;
     MoveJ RelTool(rPosDepot,0,0,0), HighSpeed, z50,pince\wobj:=wobjFeuille;
-    Confj\On;
+    Confj\Off;
+    ConfL\Off;
 
 ENDPROC
 !**************************************************************************************
