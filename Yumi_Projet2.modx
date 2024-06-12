@@ -29,6 +29,7 @@ PERS wobjdata wobjTable:=[FALSE, TRUE, "",[[-448.192, 214.145, 16.0387],[0.70140
 PERS robtarget rGlissoire:=[[-178.18,283.99,67.90],[0.200963,-0.681281,0.683955,0.166362],[0,0,0,5],[-16.6192,9E+09,9E+09,9E+09,9E+09,9E+09]];
 PERS robtarget rRetrait:=[[-266.00,14.12,221.80],[0.000550089,-0.980448,0.184406,0.0686662],[0,2,-2,5],[-1.30968,9E+09,9E+09,9E+09,9E+09,9E+09]];
 PERS jointtarget jRetrait:=[[0,0,-200,0,0,0],[9E9,9E9,9E9,9E9,9E9,9E9]];
+PERS robtarget rCentreFeuille:=[[139.5,108,-200],[1,0,0,0],[0,0,0,0],[-1.30968,9E+9,9E+9,9E+9,9E+9,9E+9]];
 
 
 
@@ -150,7 +151,8 @@ ENDPROC
 !**************************************************************************************
 PROC init()
     AliasIO CabinetIO_0_DO9_FV0101,extensionVerin;
-
+    rCentreFeuille := RelTool(coin_feuille,279/2,0,0);
+    rCentreFeuille:= RelTool(rCentreFeuille,0,216/2,0);
     ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialisation Smart gripper
     !g_Calibrate \Jog;
     G_init \Calibrate;
@@ -224,7 +226,7 @@ ENDPROC
 ! Routine qui initialise les variables systèmes et les états des sorties
 !
 ! Parametre: recoit un robtarget où aller déposer le bloc avec aproche et degagement
-!
+!https://www.youtube.com/
 ! ----------------------------------------------------------------------------
 !**************************************************************************************
 PROC ProcedureEtoile()
@@ -234,32 +236,27 @@ PROC ProcedureEtoile()
     !On deplace la piece au centre de depot
     Prise;
     ConfJ\On;
-    MoveJ coin_feuille,HighSpeed,z50,tPince\WObj:=wobjFeuille;
+    MoveJ rCentreFeuille,HighSpeed,z50,tPince\WObj:=wobjFeuille;
     ConfJ\Off;
     
     angle_decalage :=(360/(NbBranches+2));
     !apothème d'un polygone régulier https://fr.wikipedia.org/wiki/Apoth%C3%A8me
     
-    dist_decalage:= (Epaisseur/(2*tan(pi/NbBranches)));
+    dist_decalage:= (EpaisMM+10/(cos(pi/NbBranches)));
     
     IF orientation = TRUE THEN
-        rFigure:=RelTool(coin_feuille, 0,0,0 \Rz:= 180+(i * angle_decalage));
-        rFigure:= RelTool(rFigure,0,-dist_decalage,0);
+        rFigure:=RelTool(rCentreFeuille, 0,0,0 \Rz:= 180+(i * angle_decalage));
+        rFigure:= RelTool(rFigure,0,dist_decalage,0);
         WaitTime 1.5;
         Depot(rFigure);
     ENDIF
     IF orientation = FALSE THEN
-        !!On tourne l'outil de l'angle souhaité
-        rFigure:=RelTool(coin_feuille, 0,0,0 \Rz:=(i * angle_decalage));
-        !!On décale l'outil de la distance souhaitée
-        rFigure:= RelTool(rFigure,0,-dist_decalage,0);
+        rFigure:=RelTool(rCentreFeuille, 0,0,0 \Rz:=(i * angle_decalage));
+        rFigure:= RelTool(rFigure,0,dist_decalage,0);
         WaitTime 1.5;
         Depot(rFigure);
         
     ENDIF
-
-    
-    
     
     ENDFOR
     
@@ -283,14 +280,14 @@ PROC Depot(robtarget rPosDepot)
 
     ConfJ\On;
     ConfL\On;
-	MoveJ RelTool(rPosDepot,0,0,0), HighSpeed, z50, pince\wobj:=wobjFeuille;
+	MoveJ RelTool(rPosDepot,0,0,Decalage), HighSpeed, z50, pince\wobj:=wobjFeuille;
 	MoveL rPosDepot, LowSpeed, fine,pince\wobj:=wobjFeuille;
     Pince_ouverture;
     g_stop;
     !Pince_Ouvre;
     
 	MoveL RelTool(rPosDepot,0,0,0), LowSpeed, fine,pince\wobj:=wobjFeuille;
-    MoveJ RelTool(rPosDepot,0,0,0), HighSpeed, z50,pince\wobj:=wobjFeuille;
+    MoveJ RelTool(rPosDepot,0,0,Decalage), HighSpeed, z50,pince\wobj:=wobjFeuille;
     Confj\Off;
     ConfL\Off;
 
