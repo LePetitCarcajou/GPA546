@@ -16,7 +16,7 @@ MODULE Yumi_Projet2
 !!!!! gripper experimentation : wi_tGripper
 !!!!! gripper simulation : tPince
 
-CONST bool IS_SIMULATED := TRUE; !Mettre FALSE pour l'expérimentation
+CONST bool IS_SIMULATED := FALSE; !Mettre FALSE pour l'expérimentation
 
 
 ! Donnees de type position enseignees
@@ -24,28 +24,34 @@ CONST bool IS_SIMULATED := TRUE; !Mettre FALSE pour l'expérimentation
 !PERS tooldata wi_tGripper:=[TRUE,[[0,0,136],[1,0,0,0]],[0.262,[8.2,11.7,52],[1,0,0,0],0.00021,0.00024,0.00009]];
 !PERS tooldata tPince:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.229,[7.9,12.4,48.7],[1,0,0,0],0.00021,0.00023,0.00008]];
 
-PERS wobjdata wobjFeuille:=[FALSE, TRUE, "",[[-448.192, 214.145, 16.0387],[0.701409, 0.00060455, -0.00413555, -0.712747]],[[150.575,212.795,1.18812],[0.00304337,-0.999963,-0.00304785,0.00739108]]];
+PERS wobjdata wobjFeuille:=[FALSE, TRUE, "",[[-452.022, 208.098, 16.4566],[0.00107744, 0.707705, 0.706507, 0.000243236]],[[-148.415,214.975,-1.9614],[0.00351374,0.999981,0.00219485,-0.00459184]]];
 PERS wobjdata wobjTable:=[FALSE, TRUE, "",[[-448.192, 214.145, 16.0387],[0.701409, 0.00060455, -0.00413555, -0.712747]],[[0,0,0],[1,0,0,0]]];
-PERS robtarget rGlissoire:=[[-178.18,283.99,67.90],[0.200963,-0.681281,0.683955,0.166362],[0,0,0,5],[-16.6192,9E+09,9E+09,9E+09,9E+09,9E+09]];
-PERS robtarget rRetrait:=[[-266.00,14.12,221.80],[0.000550089,-0.980448,0.184406,0.0686662],[0,2,-2,5],[-1.30968,9E+09,9E+09,9E+09,9E+09,9E+09]];
-PERS jointtarget jRetrait:=[[0,0,-200,0,0,0],[9E9,9E9,9E9,9E9,9E9,9E9]];
-PERS robtarget rCentreFeuille:=[[139.5,108,-200],[1,0,0,0],[0,0,0,0],[-1.30968,9E+9,9E+9,9E+9,9E+9,9E+9]];
+PERS robtarget rGlissoire:=[[-81.62,267.40,52.93],[0.274429,0.0252957,-0.961273,-0.00166078],[-1,1,2,5],[23.6103,0,0,0,0,0]];
+
+PERS robtarget rRetrait:=[[198.78,131.59,282.02],[0.00478666,-0.999951,-0.00667389,0.005568],[-1,0,1,4],[6.03462,0,0,0,0,0]];
+PERS jointtarget jRetrait:=[[-59.7859,-6.24041,23.5578,-6.37825,64.4109,93.2528],[-119.82,0,0,0,0,0]];
 
 
 
-PERS robtarget rDepot:=[[-350.65,-89.54,24.38],[0.0307318,0.699666,-0.713584,0.0179325],[0,1,1,4],[-12.3598,9E+09,9E+09,9E+09,9E+09,9E+09]];
-PERS robtarget coin_feuille:=[[0,0,-200],[1,0,0,0],[0,0,0,0],[-1.30968,9E9,9E9,9E9,9E9,9E9]];
+
+!PERS robtarget rDepot:=[[-123.77,109.44,3.83],[0.024925,-0.00660548,0.999461,-0.0203362],[0,-1,2,4],[33.0283,0,0,0,0,0]];
+!PERS robtarget coin_feuille:=[[0,0,-200],[1,0,0,0],[0,0,0,0],[-1.30968,0,0,0,0,0]];
+
+!PERS robtarget rCentreFeuille:=[[139.5,108,-20],[1,0,0,0],[0,0,0,0],[-1.30968,0,0,0,0,0]];
+
+VAR robtarget rCentrefeuille:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+
 
 
 PERS num NbBranches; ! Valeur qui changera grace à la procédure de demande de config
 ! Donnees de type position calculees
-VAR robtarget rDepot2;
-VAR robtarget rFigure;
+VAR robtarget rFigure:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+
 
 ! Donnees de type constante
 CONST num Epaisseur:=1; ! Épaisseur d'un bloc (en pouces)
 CONST num PouceToMM:=25.4; ! Facteur de conversion
-CONST num Decalage:=-200; ! Distance d'approche ou de retrait (mm)
+CONST num Decalage:=-100; ! Distance d'approche ou de retrait (mm)
 
 ! Données de type Variable
 VAR num EpaisMM:=Epaisseur*PouceToMM;
@@ -124,17 +130,19 @@ ENDPROC
 !**************************************************************************************
 PROC main()
     
-    wobjTable.uframe:=wobjFeuille.uframe;
-    configuration;
+    !wobjTable.uframe:=wobjFeuille.uframe;
+    !configuration;
 	! 1) Initialisation :
 	init;
-    
+    ConfJ\On;
+    MoveAbsJ jRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    ConfJ\Off;
     !Verification de la securité
     !Securite;
-
     demande_configuration;
     
     ProcedureEtoile;
+    
 ENDPROC
 !**************************************************************************************
 
@@ -151,8 +159,8 @@ ENDPROC
 !**************************************************************************************
 PROC init()
     AliasIO CabinetIO_0_DO9_FV0101,extensionVerin;
-    rCentreFeuille := RelTool(coin_feuille,279/2,0,0);
-    rCentreFeuille:= RelTool(rCentreFeuille,0,216/2,0);
+    rCentreFeuille := RelTool(rCentrefeuille,279/2,0,0);
+    rCentreFeuille:= RelTool(rCentrefeuille,0,216/2,0);
     ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialisation Smart gripper
     !g_Calibrate \Jog;
     G_init \Calibrate;
@@ -188,8 +196,10 @@ PROC Prise()
     AliasIO CabinetIO_0_DI14_ZS0104, verinOut;
     AliasIO CabinetIO_0_DI13_ZS0103,verinIn;
     AliasIO CabinetIO_0_DI10_ZS0102, pieceOrientation;
-    !rGlissoire_180:=RelTool(rGlissoire,0,0,0,\Rz:=180);
     
+    ConfJ\On;
+    MoveAbsJ jRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    ConfJ\Off;
     ! Vérification de présence de bloc dans la glissoire
 	IF piecePresente = 0 THEN
 		TPErase;
@@ -203,17 +213,19 @@ PROC Prise()
     
     !!!!!On s'approche de la position!!!!
     ConfJ\On;
-	MoveJ RelTool(rGlissoire,0,0,Decalage),HighSpeed,z50,pince\WObj:=wobj0;
+	MoveJ RelTool(rGlissoire,0,0,Decalage),HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
     SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
     WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
     ConfJ\Off;
+    ConfL\On;
     !!!!!!On se met en position
-    MoveL rGlissoire, LowSpeed, fine, pince\WObj:=wobj0;
+    MoveL rGlissoire, LowSpeed, fine,wi_tGripper\WObj:=wobjTable;
     SetDO CabinetIO_0_DO9_FV0101, Retracte;
     WAITDI CabinetIO_0_DI13_ZS0103,1;
     Pince_fermeture;! Fermer la pince
-    MoveL RelTool(rGlissoire,0,0,Decalage),LowSpeed,z50,pince\WObj:=wobj0;
-
+    MoveL RelTool(rGlissoire,0,0,Decalage),LowSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    ConfL\Off;
+    
 ENDPROC
 !**************************************************************************************
 ! ----------------------------------------------------------------------------
@@ -226,41 +238,43 @@ ENDPROC
 ! Routine qui initialise les variables systèmes et les états des sorties
 !
 ! Parametre: recoit un robtarget où aller déposer le bloc avec aproche et degagement
-!https://www.youtube.com/
 ! ----------------------------------------------------------------------------
 !**************************************************************************************
 PROC ProcedureEtoile()
 
-    FOR i FROM 1 TO NbBranches+2 DO
-    !On cherche la piece dans la glissière avec prise.
-    !On deplace la piece au centre de depot
-    Prise;
-    ConfJ\On;
-    MoveJ rCentreFeuille,HighSpeed,z50,tPince\WObj:=wobjFeuille;
-    ConfJ\Off;
-    
-    angle_decalage :=(360/(NbBranches+2));
+     angle_decalage :=(360/(NbBranches+2))-1;
     !apothème d'un polygone régulier https://fr.wikipedia.org/wiki/Apoth%C3%A8me
     
-    dist_decalage:= (EpaisMM+10/(cos(pi/NbBranches)));
+    dist_decalage:= (EpaisMM+50/(cos(pi/NbBranches)));
     
-    IF orientation = TRUE THEN
-        rFigure:=RelTool(rCentreFeuille, 0,0,0 \Rz:= 180+(i * angle_decalage));
-        rFigure:= RelTool(rFigure,0,dist_decalage,0);
-        WaitTime 1.5;
-        Depot(rFigure);
-    ENDIF
-    IF orientation = FALSE THEN
-        rFigure:=RelTool(rCentreFeuille, 0,0,0 \Rz:=(i * angle_decalage));
-        rFigure:= RelTool(rFigure,0,dist_decalage,0);
-        WaitTime 1.5;
-        Depot(rFigure);
+    FOR i FROM 1 TO NbBranches+2 DO
+        !On cherche la piece dans la glissière avec prise.
+        !On deplace la piece au centre de depot
+        Prise;
+        ConfJ\On;
+        MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+        ConfJ\Off;
         
-    ENDIF
-    
+        IF orientation = FALSE THEN
+            rFigure:= RelTool(rCentrefeuille, 0,0,0 \Rz:=(180+(i*angle_decalage)));
+            rFigure:= RelTool(rFigure,0,dist_decalage,0);
+            rFigure:= RelTool(rFigure,0,0,-5);
+        
+            WaitTime 1.5;
+            Depot(rFigure);
+        ENDIF
+        IF orientation = TRUE THEN
+            rFigure:=RelTool(rCentrefeuille, 0,0,0 \Rz:=(i*angle_decalage));
+            rFigure:= RelTool(rFigure,0,dist_decalage,0);
+            rFigure:= RelTool(rFigure,0,0,-5);
+            WaitTime 1.5;
+            Depot(rFigure);
+            
+        ENDIF
+        
     ENDFOR
     
-    MoveJ rRetrait,HighSpeed,z50,pince\WObj:=wobj0;
+    MoveABSJ jRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
 
 ENDPROC
 ! ----------------------------------------------------------------------------
@@ -280,14 +294,14 @@ PROC Depot(robtarget rPosDepot)
 
     ConfJ\On;
     ConfL\On;
-	MoveJ RelTool(rPosDepot,0,0,Decalage), HighSpeed, z50, pince\wobj:=wobjFeuille;
-	MoveL rPosDepot, LowSpeed, fine,pince\wobj:=wobjFeuille;
+	MoveJ RelTool(rPosDepot,0,0,Decalage), HighSpeed, z50, wi_tGripper\wobj:=wobjFeuille;
+	MoveL rPosDepot, LowSpeed, fine,wi_tGripper\wobj:=wobjFeuille;
     Pince_ouverture;
     g_stop;
     !Pince_Ouvre;
-    
-	MoveL RelTool(rPosDepot,0,0,0), LowSpeed, fine,pince\wobj:=wobjFeuille;
-    MoveJ RelTool(rPosDepot,0,0,Decalage), HighSpeed, z50,pince\wobj:=wobjFeuille;
+
+	MoveL RelTool(rPosDepot,0,0,0), LowSpeed, fine,wi_tGripper\wobj:=wobjFeuille;
+    MoveJ RelTool(rPosDepot,0,0,Decalage), HighSpeed, z50,wi_tGripper\wobj:=wobjFeuille;
     Confj\Off;
     ConfL\Off;
 
@@ -304,11 +318,12 @@ ENDPROC
 !
 PROC Pince_ouverture()
     IF IS_SIMULATED THEN 
-    SetDO custom_DO_0_gClose,0;
-    SetDO custom_DO_1_gOpen,1;
-    WaitTime 2.0;
+        !SetDO custom_DO_0_gClose,0;
+        !SetDO custom_DO_1_gOpen, 1;
+        WaitTime 1.5;
     ELSE
         g_GripOut; !experimentation
+        WaitTime 1.5;
     ENDIF
 ENDPROC
 !**************************************************************************************
@@ -324,11 +339,12 @@ ENDPROC
 PROC Pince_fermeture()
     
     IF IS_SIMULATED THEN
-    SetDO custom_DO_0_gClose,1;
-    SetDO custom_DO_1_gOpen,0;
-    WaitTime 2.0;
+        !SetDO custom_DO_0_gClose,1;
+        !SetDO custom_DO_1_gOpen,0;
+        WaitTime 1.5;
     ELSE
         g_GripIn; !experimentation
+        WaitTime 1.5;
     ENDIF
 ENDPROC
 
@@ -348,9 +364,9 @@ PROC Securite()
     AliasIO CabinetIO_0_DO5_JB01_LampOr,LampeOrange;
     
     
-    MoveJ coin_feuille,HighSpeed,z50,pince\WObj:=wobjFeuille;
+    !MoveJ coin_feuille,HighSpeed,z50,wi_tGripper\WObj:=wobjFeuille;
     positionActuelle:= CPos();!ajouter wobjobejt
-    positionRetrait:= coin_feuille.trans;
+    !positionRetrait:= coin_feuille.trans;
     distanceSecurite:= Distance(positionActuelle,positionRetrait);
     
     IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes
@@ -393,4 +409,5 @@ ENDPROC
 !**************************************************************************************
 
 ENDMODULE
+
 
