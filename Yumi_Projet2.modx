@@ -13,10 +13,10 @@ MODULE Yumi_Projet2
 ! superposer sur une table de travail.
 ! ----------------------------------------------------------------------------
 
-!!!!! gripper experimentation : wi_tGripper
+!!!!! gripper experimentation : tPince
 !!!!! gripper simulation : tPince
 
-CONST bool IS_SIMULATED := FALSE; !Mettre FALSE pour l'expérimentation
+CONST bool IS_SIMULATED := true; !Mettre FALSE pour l'expérimentation
 
 
 ! Donnees de type position enseignees
@@ -27,9 +27,9 @@ CONST bool IS_SIMULATED := FALSE; !Mettre FALSE pour l'expérimentation
 PERS wobjdata wobjFeuille:=[FALSE, TRUE, "",[[-452.022, 208.098, 16.4566],[0.00107744, 0.707705, 0.706507, 0.000243236]],[[-148.415,214.975,-1.9614],[0.00351374,0.999981,0.00219485,-0.00459184]]];
 PERS wobjdata wobjTable:=[FALSE, TRUE, "",[[-452.022, 208.098, 16.4566],[0.00107744, 0.707705, 0.706507, 0.000243236]],[[0,0,0],[1,0,0,0]]];
 PERS robtarget rGlissoire:=[[78.06,273.10,-48.47],[0.960735,-0.012183,0.276523,0.0193467],[-1,-1,0,4],[22.4142,0,0,0,0,0]];
-PERS robtarget rRetrait:=[[-309.20,181.94,-252.48],[0.999603,0.0176453,0.0140764,-0.0168448],[-1,-1,0,4],[79.5194,9E+09,9E+09,9E+09,9E+09,9E+09]];
+PERS robtarget rRetrait:=[[-309.20,181.94,-252.48],[0.999603,0.0176453,0.0140764,-0.0168448],[-1,-1,0,4],[79.5194,0,0,0,0,0]];
 
-PERS jointtarget jRetrait:=[[-52.0166,-72.6857,40.9466,-67.1663,93.0721,-9.76988],[-71.6422,9E+09,9E+09,9E+09,9E+09,9E+09]];
+PERS jointtarget jRetrait:=[[-52.0166,-72.6857,40.9466,-67.1663,93.0721,-9.76988],[-71.6422,0,0,0,0,0]];
 
 
 PERS num NbBranches; ! Valeur qui changera grace à la procédure de demande de config
@@ -37,7 +37,7 @@ PERS num NbBranches; ! Valeur qui changera grace à la procédure de demande de 
 
 ! Donnees de type position calculees
 VAR robtarget rFigure:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-VAR robtarget rCentrefeuille:=[[-139,108,5],[0.00351374,0.999981,0.00219485,-0.00459184],[0,0,0,0],[-1.30968,0,0,0,0,0]];
+VAR robtarget rCentrefeuille:=[[-139,108,5],[0.00351374,0.999981,0.00219485,-0.00459184],[-1,-1,0,3],[-1.30968,0,0,0,0,0]];!configddata à changezr et jouer avec les conf On off dans le depot
 
 
 ! Données de type Variable
@@ -121,25 +121,16 @@ ENDPROC
 !**************************************************************************************
 PROC main()
     
-    wobjTable.uframe:=wobjFeuille.uframe;
+    wobjTable.uframe:=wobjFeuille.uframe;    
     configuration;
 	! 1) Initialisation :
 	init;
-    ConfJ\On;
-    MoveAbsJ jRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
-    ConfJ\Off;
-    ConfJ\On;
-    Prise;
-    ConfJ\On;
-    MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
-    ConfJ\Off;
-    Depot(rCentrefeuille);
-    EXIT;
+     NbBranches:=3;
     !Verification de la securité
     !Securite;
     !demande_configuration;
     
-    !ProcedureEtoile;
+    ProcedureEtoile;
     
 ENDPROC
 !**************************************************************************************
@@ -192,7 +183,7 @@ PROC Prise()
     AliasIO CabinetIO_0_DI10_ZS0102, pieceOrientation;
     
     ConfJ\On;
-    MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    MoveJ rRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
     ConfJ\Off;
     ! Vérification de présence de bloc dans la glissoire
 	IF piecePresente = 0 THEN
@@ -207,19 +198,19 @@ PROC Prise()
     
     !!!On s'approche de la position!!!
     ConfJ\On;
-	MoveJ Reltool(rGlissoire,0,0,Decalage),HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+	MoveJ Reltool(rGlissoire,0,0,Decalage),HighSpeed,z50,tPince\WObj:=wobjTable;
     SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
     WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
     ConfJ\Off;
     ConfL\On;
     !!!!!!On se met en position
-    MoveL rGlissoire, LowSpeed, fine,wi_tGripper\WObj:=wobjTable;
+    MoveL rGlissoire, LowSpeed, fine,tPince\WObj:=wobjTable;
     SetDO CabinetIO_0_DO9_FV0101, Retracte;
     WAITDI CabinetIO_0_DI13_ZS0103,1;
     Pince_fermeture;! Fermer la pince
     
     !!!! on s'écarte!!!
-    MoveL Reltool(rGlissoire,0,0,Decalage),LowSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    MoveL Reltool(rGlissoire,0,0,Decalage),LowSpeed,z50,tPince\WObj:=wobjTable;
     ConfL\Off;
     
 ENDPROC
@@ -248,7 +239,7 @@ PROC ProcedureEtoile()
         !On deplace la piece au centre de depot
         Prise;
         ConfJ\On;
-        MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+        MoveJ rRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
         ConfJ\Off;
         
         IF orientation = FALSE THEN
@@ -266,7 +257,7 @@ PROC ProcedureEtoile()
         ENDIF
     ENDFOR
     
-    MoveABSJ jRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    MoveABSJ jRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
 
 ENDPROC
 ! ----------------------------------------------------------------------------
@@ -285,20 +276,18 @@ ENDPROC
 PROC Depot(robtarget rPosDepot)
 
     ConfJ\On;
-    MoveJ RelTool(rPosDepot,0,0,Decalage),HighSpeed,z50,wi_tGripper\WObj:=wobjFeuille;
+    MoveJ rRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
     ConfJ\Off;
+    MoveJ RelTool(rPosDepot,0,0,Decalage),HighSpeed,z50,tPince\WObj:=wobjFeuille;
+    
     ConfL\On;
-	MoveL rPosDepot, LowSpeed, z0,wi_tGripper\wobj:=wobjFeuille;
+    MoveL rPosDepot, LowSpeed, z0,tPince\wobj:=wobjFeuille;
     ConfL\Off;
+    
     Pince_ouverture;
     g_stop;
-    !Pince_Ouvre;
-    ConfL\On;
-	MoveL RelTool(rPosDepot,0,0,Decalage), LowSpeed, z0,wi_tGripper\wobj:=wobjFeuille;
-    ConfL\Off;
-    ConfJ\On;
-    MoveJ rRetrait,HighSpeed,z50,wi_tGripper\wobj:=wobjTable;
-    Confj\Off;
+	MoveL RelTool(rPosDepot,0,0,Decalage), LowSpeed, z0,tPince\wobj:=wobjFeuille;
+    MoveJ rRetrait,HighSpeed,z50,tPince\wobj:=wobjTable;
 ENDPROC
 !**************************************************************************************
 ! ----------------------------------------------------------------------------
@@ -312,8 +301,8 @@ ENDPROC
 !
 PROC Pince_ouverture()
     IF IS_SIMULATED THEN 
-        !SetDO custom_DO_0_gClose,0;
-        !SetDO custom_DO_1_gOpen, 1;
+        SetDO custom_DO_0_gClose,0;
+        SetDO custom_DO_1_gOpen, 1;
         WaitTime 1.5;
     ELSE
         g_GripOut; !experimentation
@@ -333,8 +322,8 @@ ENDPROC
 PROC Pince_fermeture()
     
     IF IS_SIMULATED THEN
-        !SetDO custom_DO_0_gClose,1;
-        !SetDO custom_DO_1_gOpen,0;
+        SetDO custom_DO_0_gClose,1;
+        SetDO custom_DO_1_gOpen,0;
         WaitTime 1.5;
     ELSE
         g_GripIn; !experimentation
