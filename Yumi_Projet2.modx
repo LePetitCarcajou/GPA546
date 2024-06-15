@@ -13,31 +13,44 @@ MODULE Yumi_Projet2
 ! superposer sur une table de travail.
 ! ----------------------------------------------------------------------------
 
-!!!!! gripper experimentation : tPince
+!!!!! gripper experimentation : wi_tGripper
 !!!!! gripper simulation : tPince
 
-CONST bool IS_SIMULATED := true; !Mettre FALSE pour l'expérimentation
+CONST bool IS_SIMULATED := FALSE; !Mettre FALSE pour l'expérimentation
 
 
 ! Donnees de type position enseignees
 
-!PERS tooldata wi_tGripper:=[TRUE,[[0,0,136],[1,0,0,0]],[0.262,[8.2,11.7,52],[1,0,0,0],0.00021,0.00024,0.00009]];
-!PERS tooldata tPince:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.229,[7.9,12.4,48.7],[1,0,0,0],0.00021,0.00023,0.00008]];
-
 PERS wobjdata wobjFeuille:=[FALSE, TRUE, "",[[-452.022, 208.098, 16.4566],[0.00107744, 0.707705, 0.706507, 0.000243236]],[[-148.415,214.975,-1.9614],[0.00351374,0.999981,0.00219485,-0.00459184]]];
 PERS wobjdata wobjTable:=[FALSE, TRUE, "",[[-452.022, 208.098, 16.4566],[0.00107744, 0.707705, 0.706507, 0.000243236]],[[0,0,0],[1,0,0,0]]];
-PERS robtarget rGlissoire:=[[78.06,273.10,-48.47],[0.960735,-0.012183,0.276523,0.0193467],[-1,-1,0,4],[22.4142,0,0,0,0,0]];
-PERS robtarget rRetrait:=[[-309.20,181.94,-252.48],[0.999603,0.0176453,0.0140764,-0.0168448],[-1,-1,0,4],[79.5194,0,0,0,0,0]];
+!PERS robtarget rGlissoire:=[[81.45,279.80,-51.13],[0.945604,-0.014515,0.324964,-0.00457284],[0,-2,1,4],[-58.4266,0,0,0,0,0]];
+!PERS robtarget rRetrait:=[[-258.99,129.71,-192.70],[0.998791,-0.00905329,-0.0106928,0.0471184],[0,-2,1,5],[-8.45374,0,0,0,0,0]];
+!PERS jointtarget jRetrait:=[[25.1753,-25.7886,28.7884,-164.083,-38.7501,90.1599],[160.342,0,0,0,0,0]]
 
-PERS jointtarget jRetrait:=[[-52.0166,-72.6857,40.9466,-67.1663,93.0721,-9.76988],[-71.6422,0,0,0,0,0]];
+!PERS robtarget rGlissoire:=[[83.44,276.52,-51.86],[0.0130279,-0.307219,-0.0152735,-0.951427],[0,0,1,5],[-48.6048,0,0,0,0,0]];
+!PERS robtarget rRetrait:=[[-254.28,123.34,-158.00],[0.0103651,0.00227058,0.0246971,0.999639],[0,0,1,4],[-8.43343,0,0,0,0,0]];
+!PERS jointtarget jRetrait:=[[25.1755,-25.7895,28.7877,13.2616,40.4802,85.6507],[160.343,0,0,0,0,0]];
 
+!PERS robtarget rGlissoire:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+!PERS robtarget rRetrait:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+!PERS jointtarget jRetrait:=[[0,0,0,0,0,0],[0,0,0,0,0,0]];
+
+PERS robtarget rGlissoire:=[[76.69,271.22,-50.11],[0.951829,0.000208165,0.306451,-0.0104055],[-1,-2,-1,4],[76.6242,0,0,0,0,0]];
+PERS robtarget rRetrait:=[[-284.43,78.13,-239.45],[0.999406,-0.0104761,0.0268698,0.0188667],[0,0,-1,4],[29.7439,0,0,0,0,0]];
+PERS jointtarget jRetrait:=[[-33.7686,-33.4985,12.5811,-34.0392,66.0374,-49.6469],[-120.131,0,0,0,0,0]];
 
 PERS num NbBranches; ! Valeur qui changera grace à la procédure de demande de config
 
+!PERS robtarget TEST_config:=[[-137.63,106.21,30.06],[0.00398947,0.999951,-0.00110888,-0.00896096],[1,-3,-2,4],[-68.2488,0,0,0,0,0]];
+!PERS robtarget TEST_config:=[[-284.70,108.54,-3.83],[0,0,0,1],[0,-1,2,4],[63.8228,0,0,0,0,0]];
+
+PERS robtarget TEST_config:=[[-292.37,100.23,-9.71],[0.999406,-0.0104766,0.0268675,0.0188693],[0,-1,0,4],[29.7441,0,0,0,0,0]];
 
 ! Donnees de type position calculees
 VAR robtarget rFigure:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-VAR robtarget rCentrefeuille:=[[-139,108,5],[0.00351374,0.999981,0.00219485,-0.00459184],[-1,-1,0,3],[-1.30968,0,0,0,0,0]];!configddata à changezr et jouer avec les conf On off dans le depot
+!VAR robtarget rCentrefeuille:=[[-139,108,5],[0.,1,0,0],[1,-3,-2,4],[-68.2488,0,0,0,0,0]];
+VAR robtarget rCentrefeuille:=[[-139,108,5],[1,0,0,0],[0,-1,0,4],[29.7441,0,0,0,0,0]];!configddata à changezr et jouer avec les conf On off dans le depot
+VAR robtarget rGlissoire_180:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 
 
 ! Données de type Variable
@@ -48,15 +61,15 @@ VAR pos positionActuelle;
 VAR string differenceSecurite;
 VAR bool orientation;
 VAR num angle_decalage;
+VAR num angle_check;
 VAR num dist_decalage;
 
 
 ! Donnees de type constante
 CONST num Epaisseur:=1; ! Épaisseur d'un bloc (en pouces)
 CONST num PouceToMM:=25.4; ! Facteur de conversion
-CONST num Decalage:=-200; ! Distance d'approche ou de retrait (mm)
-!CONST num demilongeur:=-279/2;
-!CONST num demilargeur:=-216/2;
+CONST num Decalage:=-100; ! Distance d'approche ou de retrait (mm)
+
 ! Vitesse d'approche et de retrait (mm/sec)
 CONST speeddata LowSpeed:=[250,500,5000,1000];
 
@@ -81,9 +94,7 @@ VAR signaldi verinOut;
 VAR signaldi verinIn;
 VAR signaldo extensionVerin;
 
-!Variable configurable en fonctino de la configuration
 
-PERS tooldata pince;
 
   ! ----------------------------------------------------------------------------
 ! Procedure : configuration
@@ -98,14 +109,6 @@ PERS tooldata pince;
 !
 ! ----------------------------------------------------------------------------
 !**************************************************************************************
-  
-PROC configuration()
-    IF IS_SIMULATED THEN
-        pince:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.229,[7.9,12.4,48.7],[1,0,0,0],0.00021,0.00023,0.00008]];
-    ELSE
-        pince:=[TRUE,[[0,0,136],[1,0,0,0]],[0.262,[8.2,11.7,52],[1,0,0,0],0.00021,0.00024,0.00009]];
-    ENDIF
-ENDPROC
   
 ! ----------------------------------------------------------------------------
 ! Procedure : main
@@ -122,14 +125,31 @@ ENDPROC
 PROC main()
     
     wobjTable.uframe:=wobjFeuille.uframe;    
-    configuration;
+
 	! 1) Initialisation :
 	init;
-     NbBranches:=3;
-    !Verification de la securité
-    !Securite;
-    !demande_configuration;
+!    NbBranches:=1;
+!    !Verification de la securité
+!    !Securite;
+!    !demande_configuration;
+!    ProcedureEtoile;
     
+!    WaitTime 3;
+!    NbBranches:=2;
+!    ProcedureEtoile;
+
+    MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    
+!    WaitTime 3;
+    NbBranches:=3;
+    ProcedureEtoile;
+    
+    WaitTime 3;
+    NbBranches:=4;
+    ProcedureEtoile;
+    
+    WaitTime 3;
+    NbBranches:=5;
     ProcedureEtoile;
     
 ENDPROC
@@ -155,182 +175,12 @@ PROC init()
 	VelSet 25,1000; ! Limitation imposée pour la sécurité, obligatoire
 
 	SetDO extensionVerin, Retracte; ! Rentrer le vérin         %% IRB1600: CabinetIO_0_DO9_FV0101, Retracte
-	 
+	
     !g_GripOut; ! Ouvrir la pince
     Pince_ouverture;
     WaitTime 2;
     
 ENDPROC
-!**************************************************************************************
-
-! ----------------------------------------------------------------------------
-! Procedure : Prise
-! Auteurs : Yanick Noiseux
-! Date : 4-08-2011
-! Révision : 1.0
-!
-! Description :
-! Routine qui s'approche du glissoire, atends une piece, 
-! l'indexe et la prends de maniere securitaire
-!
-! ----------------------------------------------------------------------------
-!**************************************************************************************
-PROC Prise()
-    AliasIO CabinetIO_0_DI9_ZS0101, piecePresente;
-    AliasIO CabinetIO_0_DO9_FV0101,extensionVerin;
-    AliasIO CabinetIO_0_DI14_ZS0104, verinOut;
-    AliasIO CabinetIO_0_DI13_ZS0103,verinIn;
-    AliasIO CabinetIO_0_DI10_ZS0102, pieceOrientation;
-    
-    ConfJ\On;
-    MoveJ rRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
-    ConfJ\Off;
-    ! Vérification de présence de bloc dans la glissoire
-	IF piecePresente = 0 THEN
-		TPErase;
-		TPWrite "Aucun bloc dans la glissoire";
-		TPWrite "Placer deux bloc et remettre en mode AUTO";
-		WaitDI piecePresente, 1; ! Attente d'un bloc
-		Waittime 1; ! attente que le bloc se stabilise
-	ENDIF
-    !Test orientation piece 
-    orientation:=TestDi(pieceOrientation);
-    
-    !!!On s'approche de la position!!!
-    ConfJ\On;
-	MoveJ Reltool(rGlissoire,0,0,Decalage),HighSpeed,z50,tPince\WObj:=wobjTable;
-    SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
-    WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
-    ConfJ\Off;
-    ConfL\On;
-    !!!!!!On se met en position
-    MoveL rGlissoire, LowSpeed, fine,tPince\WObj:=wobjTable;
-    SetDO CabinetIO_0_DO9_FV0101, Retracte;
-    WAITDI CabinetIO_0_DI13_ZS0103,1;
-    Pince_fermeture;! Fermer la pince
-    
-    !!!! on s'écarte!!!
-    MoveL Reltool(rGlissoire,0,0,Decalage),LowSpeed,z50,tPince\WObj:=wobjTable;
-    ConfL\Off;
-    
-ENDPROC
-!**************************************************************************************
-! ----------------------------------------------------------------------------
-! Procedure : Procedure Etoiles
-! Auteurs : Yanick Noiseux
-! Date : 4-08-2011
-! Révision : 1.1
-! Révision par: Martin Gaudreault
-! Description :
-! Routine qui initialise les variables systèmes et les états des sorties
-!
-! Parametre: recoit un robtarget où aller déposer le bloc avec aproche et degagement
-! ----------------------------------------------------------------------------
-!**************************************************************************************
-PROC ProcedureEtoile()
-
-    angle_decalage :=(360/(NbBranches+2));
-    !apothème d'un polygone régulier https://fr.wikipedia.org/wiki/Apoth%C3%A8me
-    
-    dist_decalage:= (EpaisMM+50/(cos(pi/NbBranches)));
-    
-    FOR i FROM 1 TO NbBranches+2 DO
-        !On cherche la piece dans la glissière avec prise.
-        !On deplace la piece au centre de depot
-        Prise;
-        ConfJ\On;
-        MoveJ rRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
-        ConfJ\Off;
-        
-        IF orientation = FALSE THEN
-            rFigure:= RelTool(rCentrefeuille, 0,0,0 \Rz:=(180+(i*angle_decalage)));
-            rFigure:= RelTool(rFigure,0,dist_decalage,0);
-            WaitTime 1.5;
-            Depot(rFigure);
-        ENDIF
-        IF orientation = TRUE THEN
-            rFigure:=RelTool(rCentrefeuille, 0,0,0 \Rz:=(i*angle_decalage));
-            rFigure:= RelTool(rFigure,0,dist_decalage,0);
-            WaitTime 1.5;
-            Depot(rFigure);
-            
-        ENDIF
-    ENDFOR
-    
-    MoveABSJ jRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
-
-ENDPROC
-! ----------------------------------------------------------------------------
-! Procedure : Depot
-! Auteurs : Yanick Noiseux
-! Date : 4-08-2011
-! Révision : 1.1
-! Révision par: Martin Gaudreault
-! Description :
-! Routine qui initialise les variables systèmes et les états des sorties
-!
-! Parametre: recoit un robtarget où aller déposer le bloc avec aproche et degagement
-!
-! ----------------------------------------------------------------------------
-!**************************************************************************************
-PROC Depot(robtarget rPosDepot)
-
-    ConfJ\On;
-    MoveJ rRetrait,HighSpeed,z50,tPince\WObj:=wobjTable;
-    ConfJ\Off;
-    MoveJ RelTool(rPosDepot,0,0,Decalage),HighSpeed,z50,tPince\WObj:=wobjFeuille;
-    
-    ConfL\On;
-    MoveL rPosDepot, LowSpeed, z0,tPince\wobj:=wobjFeuille;
-    ConfL\Off;
-    
-    Pince_ouverture;
-    g_stop;
-	MoveL RelTool(rPosDepot,0,0,Decalage), LowSpeed, z0,tPince\wobj:=wobjFeuille;
-    MoveJ rRetrait,HighSpeed,z50,tPince\wobj:=wobjTable;
-ENDPROC
-!**************************************************************************************
-! ----------------------------------------------------------------------------
-! Procedure : Pince_ouverture
-! Auteurs : Martin EUZENAT
-! Date : 30/05/2024
-! Révision : 1.1
-! Révision par:
-! Description :
-! Routine permet la fermeture de la pince simulation/experimentation
-!
-PROC Pince_ouverture()
-    IF IS_SIMULATED THEN 
-        SetDO custom_DO_0_gClose,0;
-        SetDO custom_DO_1_gOpen, 1;
-        WaitTime 1.5;
-    ELSE
-        g_GripOut; !experimentation
-        WaitTime 1.5;
-    ENDIF
-ENDPROC
-!**************************************************************************************
-! ----------------------------------------------------------------------------
-! Procedure : Pince_fermeture 
-! Auteurs : Martin EUZENAT
-! Date : 30/05/2024
-! Révision : 1.1
-! Révision par :
-! Description :
-! Routine permet la fermeture de la pince simulation/experimentation
-!
-PROC Pince_fermeture()
-    
-    IF IS_SIMULATED THEN
-        SetDO custom_DO_0_gClose,1;
-        SetDO custom_DO_1_gOpen,0;
-        WaitTime 1.5;
-    ELSE
-        g_GripIn; !experimentation
-        WaitTime 1.5;
-    ENDIF
-ENDPROC
-
 !**************************************************************************************
 ! ----------------------------------------------------------------------------
 ! Procedure : Securite
@@ -346,10 +196,8 @@ PROC Securite()
     AliasIO CabinetIO_0_DO4_JB01_LampBlu,LampeBleue;
     AliasIO CabinetIO_0_DO5_JB01_LampOr,LampeOrange;
     
-    
-    !MoveJ coin_feuille,HighSpeed,z50,tPince\WObj:=wobjFeuille;
-    positionActuelle:= CPos();!ajouter wobjobejt
-    !positionRetrait:= coin_feuille.trans;
+    positionActuelle:= CPos(\WObj:=wobjTable);!ajouter wobjobejt
+    positionRetrait:= rRetrait.trans;
     distanceSecurite:= Distance(positionActuelle,positionRetrait);
     
     IF distanceSecurite<=50 THEN ! Validation réussie, allume lampe bleue 2 secondes
@@ -371,6 +219,215 @@ PROC Securite()
 ENDPROC
 
 !**************************************************************************************
+
+! ----------------------------------------------------------------------------
+! Procedure : Prise
+! Auteurs : Yanick Noiseux
+! Date : 4-08-2011
+! Révision : 1.0
+!
+! Description :
+! Routine qui s'approche du glissoire, atends une piece, 
+! l'indexe et la prends de maniere securitaire
+!
+! ----------------------------------------------------------------------------
+!**************************************************************************************
+PROC Prise()
+    AliasIO CabinetIO_0_DI9_ZS0101, piecePresente;
+    AliasIO CabinetIO_0_DO9_FV0101,extensionVerin;
+    AliasIO CabinetIO_0_DI14_ZS0104, verinOut;
+    AliasIO CabinetIO_0_DI13_ZS0103,verinIn;
+    AliasIO CabinetIO_0_DI10_ZS0102, pieceOrientation;
+    rGlissoire_180:=RelTool(rGlissoire,0,0,0,\Rz:=180);
+    
+    ConfJ\On;
+    MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    ConfJ\Off;
+    ! Vérification de présence de bloc dans la glissoire
+	IF piecePresente = 0 THEN
+		TPErase;
+		TPWrite "Aucun bloc dans la glissoire";
+		TPWrite "Placer deux bloc et remettre en mode AUTO";
+		WaitDI piecePresente, 1; ! Attente d'un bloc
+		Waittime 1; ! attente que le bloc se stabilise
+	ENDIF
+    !Test orientation piece 
+    orientation:=TestDi(pieceOrientation);
+    
+    IF orientation = TRUE THEN
+        !!!On s'approche de la position!!!
+        ConfJ\On;
+    	MoveJ Reltool(rGlissoire,0,0,Decalage),HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+        ConfJ\Off;
+        
+        SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
+        WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
+        
+        !!!!!!On se met en position
+        ConfL\On;
+        MoveL rGlissoire, LowSpeed, fine,wi_tGripper\WObj:=wobjTable;
+        ConfL\Off;
+        SetDO CabinetIO_0_DO9_FV0101, Retracte;
+        WAITDI CabinetIO_0_DI13_ZS0103,1;
+        
+        Pince_fermeture;! Fermer la pince
+        
+        !!!! on s'écarte!!!
+        ConfL\On;
+        MoveL Offs(rGlissoire,0,3,Decalage),LowSpeed,z50,wi_tGripper\WObj:=wobjTable;
+        ConfL\Off;
+    ENDIF 
+    
+    IF orientation = FALSE THEN
+        !!!On s'approche de la position!!!
+        ConfJ\On;
+    	MoveJ Reltool(rGlissoire_180,0,0,Decalage),HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+        ConfJ\Off;
+        
+        SetDO CabinetIO_0_DO9_FV0101, Extension; ! Indexer le bloc durant le mouvement
+        WAITDI CabinetIO_0_DI14_ZS0104,1; ! Attendre pour le vérin sortie
+        
+        !!!!!!On se met en position
+        ConfL\On;
+        MoveL rGlissoire_180, LowSpeed, fine,wi_tGripper\WObj:=wobjTable;
+        ConfL\Off;
+        SetDO CabinetIO_0_DO9_FV0101, Retracte;
+        WAITDI CabinetIO_0_DI13_ZS0103,1;
+        
+        Pince_fermeture;! Fermer la pince
+        
+        !!!! on s'écarte!!!
+        ConfL\On;
+        MoveL Offs(rGlissoire_180,0,3,Decalage),LowSpeed,z50,wi_tGripper\WObj:=wobjTable;
+        ConfL\Off;
+    ENDIF 
+    
+ENDPROC
+!**************************************************************************************
+! ----------------------------------------------------------------------------
+! Procedure : Procedure Etoiles
+! Auteurs : Yanick Noiseux
+! Date : 4-08-2011
+! Révision : 1.1
+! Révision par: Martin Gaudreault
+! Description :
+! Routine qui initialise les variables systèmes et les états des sorties
+!
+! Parametre: recoit un robtarget où aller déposer le bloc avec aproche et degagement
+! ----------------------------------------------------------------------------
+!**************************************************************************************
+PROC ProcedureEtoile()
+
+    angle_decalage :=(360/(NbBranches+2));
+    !apothème d'un polygone régulier https://fr.wikipedia.org/wiki/Apoth%C3%A8me
+    
+    dist_decalage:= 51+((EpaisMM)/(2*tan(180/(NbBranches+2))));
+    
+    FOR i FROM 1 TO NbBranches+2 DO
+        !On cherche la piece dans la glissière avec prise.
+        !On deplace la piece au centre de depot
+        
+        Prise;
+        ConfJ\On;
+        MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+        ConfJ\Off;
+        
+        angle_check := (i-1)*(angle_decalage);
+        
+        IF angle_check<-180 THEN
+            angle_check := angle_check+360;
+        ENDIF
+        
+        IF angle_check>180 THEN
+            angle_check := angle_check-360;
+        ENDIF
+        rFigure:= RelTool(rCentrefeuille,0,0,0 \Rz:=(angle_check));
+        rFigure:=RelTool(rFigure,0,0,0 \Rx:=180);
+        rFigure:= RelTool(rFigure,0,-dist_decalage,0);
+        WaitTime 1;
+        Depot(rFigure);
+    
+    ENDFOR
+    
+    ConfJ\On;
+    MoveABSJ jRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    ConfJ\Off;
+
+ENDPROC
+! ----------------------------------------------------------------------------
+! Procedure : Depot
+! Auteurs : Yanick Noiseux
+! Date : 4-08-2011
+! Révision : 1.1
+! Révision par: Martin Gaudreault
+! Description :
+! Routine qui initialise les variables systèmes et les états des sorties
+!
+! Parametre: recoit un robtarget où aller déposer le bloc avec aproche et degagement
+!
+! ----------------------------------------------------------------------------
+!**************************************************************************************
+PROC Depot(robtarget rPosDepot)
+
+    ConfJ\On;
+    MoveJ rRetrait,HighSpeed,z50,wi_tGripper\WObj:=wobjTable;
+    ConfJ\Off;
+    MoveJ RelTool(rPosDepot,0,0,Decalage),HighSpeed,z50,wi_tGripper\WObj:=wobjFeuille;
+    
+    ConfL\off;
+    MoveL rPosDepot, LowSpeed, fine,wi_tGripper\wobj:=wobjFeuille;
+
+    Pince_ouverture;
+    g_stop;
+	MoveL RelTool(rPosDepot,0,0,Decalage), LowSpeed, z0,wi_tGripper\wobj:=wobjFeuille;
+    ConfJ\On;
+    MoveJ rRetrait,HighSpeed,z50,wi_tGripper\wobj:=wobjTable;
+    ConfJ\Off;
+ENDPROC
+!**************************************************************************************
+! ----------------------------------------------------------------------------
+! Procedure : Pince_ouverture
+! Auteurs : Martin EUZENAT
+! Date : 30/05/2024
+! Révision : 1.1
+! Révision par:
+! Description :
+! Routine permet la fermeture de la pince simulation/experimentation
+!
+PROC Pince_ouverture()
+    IF IS_SIMULATED THEN 
+        !SetDO custom_DO_0_gClose,0;
+        !SetDO custom_DO_1_gOpen, 1;
+        WaitTime 1;
+    ELSE
+        g_GripOut; !experimentation
+        WaitTime 1;
+    ENDIF
+ENDPROC
+!**************************************************************************************
+! ----------------------------------------------------------------------------
+! Procedure : Pince_fermeture 
+! Auteurs : Martin EUZENAT
+! Date : 30/05/2024
+! Révision : 1.1
+! Révision par :
+! Description :
+! Routine permet la fermeture de la pince simulation/experimentation
+!
+PROC Pince_fermeture()
+    
+    IF IS_SIMULATED THEN
+        !SetDO custom_DO_0_gClose,1;
+        !SetDO custom_DO_1_gOpen,0;
+        WaitTime 1;
+    ELSE
+        g_GripIn; !experimentation
+        WaitTime 1;
+    ENDIF
+ENDPROC
+
+
+!**************************************************************************************
 ! ----------------------------------------------------------------------------
 ! Procedure : demande_configuration
 ! Auteurs : Martin EUZENAT
@@ -386,7 +443,7 @@ PROC demande_configuration()
     TPReadFK NbBranches, "Nombre de branches", "3", "4","5", "6", "7";
     
     TPWrite "Configuration prise en compte. Attention au robot";
-    WaitTime 1.5;
+    WaitTime 1;
     
 ENDPROC
 !**************************************************************************************
